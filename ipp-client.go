@@ -130,7 +130,7 @@ func (c *IPPClient) SendRequest(url string, req *Request, additionalResponseData
 
 // PrintDocuments prints one or more documents using a Create-Job operation followed by one or more Send-Document operation(s). custom job settings can be specified via the jobAttributes parameter
 func (c *IPPClient) PrintDocuments(docs []Document, printer string, jobAttributes map[string]interface{}) (int, error) {
-	printerURI := c.getPrinterUri(printer)
+	printerURI := c.getPrinterUri(c.namespace, printer)
 
 	req := NewRequest(OperationCreateJob, 1)
 	req.OperationAttributes[AttributePrinterURI] = printerURI
@@ -180,7 +180,7 @@ func (c *IPPClient) PrintDocuments(docs []Document, printer string, jobAttribute
 
 // PrintJob prints a document using a Print-Job operation. custom job settings can be specified via the jobAttributes parameter
 func (c *IPPClient) PrintJob(doc Document, printer string, jobAttributes map[string]interface{}) (int, error) {
-	printerURI := c.getPrinterUri(printer)
+	printerURI := c.getPrinterUri(c.namespace, printer)
 
 	req := NewRequest(OperationPrintJob, 1)
 	req.OperationAttributes[AttributePrinterURI] = printerURI
@@ -243,7 +243,7 @@ func (c *IPPClient) PrintFile(filePath, printer string, jobAttributes map[string
 // GetPrinterAttributes returns the requested attributes for the specified printer, if attributes is nil the default attributes will be used
 func (c *IPPClient) GetPrinterAttributes(printer string, attributes []string) (Attributes, error) {
 	req := NewRequest(OperationGetPrinterAttributes, 1)
-	req.OperationAttributes[AttributePrinterURI] = c.getPrinterUri(printer)
+	req.OperationAttributes[AttributePrinterURI] = c.getPrinterUri(c.namespace, printer)
 	req.OperationAttributes[AttributeRequestingUserName] = c.username
 
 	if attributes == nil {
@@ -267,7 +267,7 @@ func (c *IPPClient) GetPrinterAttributes(printer string, attributes []string) (A
 // ResumePrinter resumes a printer
 func (c *IPPClient) ResumePrinter(printer string) error {
 	req := NewRequest(OperationResumePrinter, 1)
-	req.OperationAttributes[AttributePrinterURI] = c.getPrinterUri(printer)
+	req.OperationAttributes[AttributePrinterURI] = c.getPrinterUri(c.namespace, printer)
 
 	_, err := c.SendRequest(c.getHttpUri("admin", ""), req, nil)
 	return err
@@ -276,7 +276,7 @@ func (c *IPPClient) ResumePrinter(printer string) error {
 // PausePrinter pauses a printer
 func (c *IPPClient) PausePrinter(printer string) error {
 	req := NewRequest(OperationPausePrinter, 1)
-	req.OperationAttributes[AttributePrinterURI] = c.getPrinterUri(printer)
+	req.OperationAttributes[AttributePrinterURI] = c.getPrinterUri(c.namespace, printer)
 
 	_, err := c.SendRequest(c.getHttpUri("admin", ""), req, nil)
 	return err
@@ -312,7 +312,7 @@ func (c *IPPClient) GetJobs(printer, class string, whichJobs string, myJobs bool
 	req.OperationAttributes[AttributeMyJobs] = myJobs
 
 	if printer != "" {
-		req.OperationAttributes[AttributePrinterURI] = c.getPrinterUri(printer)
+		req.OperationAttributes[AttributePrinterURI] = c.getPrinterUri(c.namespace, printer)
 	} else if class != "" {
 		req.OperationAttributes[AttributePrinterURI] = c.getClassUri(printer)
 	} else {
@@ -364,7 +364,7 @@ func (c *IPPClient) CancelJob(jobID int, purge bool) error {
 // CancelAllJob cancels all jobs for a specified printer. if purge is true, the jobs will also be removed
 func (c *IPPClient) CancelAllJob(printer string, purge bool) error {
 	req := NewRequest(OperationCancelJobs, 1)
-	req.OperationAttributes[AttributePrinterURI] = c.getPrinterUri(printer)
+	req.OperationAttributes[AttributePrinterURI] = c.getPrinterUri(c.namespace, printer)
 	req.OperationAttributes[AttributePurgeJobs] = purge
 
 	_, err := c.SendRequest(c.getHttpUri("admin", ""), req, nil)
