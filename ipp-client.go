@@ -25,6 +25,7 @@ type Document struct {
 type IPPClient struct {
 	host     string
 	port     int
+	namespace string
 	username string
 	password string
 	useTLS   bool
@@ -33,7 +34,7 @@ type IPPClient struct {
 }
 
 // NewIPPClient creates a new generic ipp client
-func NewIPPClient(host string, port int, username, password string, useTLS bool) *IPPClient {
+func NewIPPClient(host string, port int, namespace, username, password string, useTLS bool) *IPPClient {
 	httpClient := http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
@@ -42,7 +43,7 @@ func NewIPPClient(host string, port int, username, password string, useTLS bool)
 		},
 	}
 
-	return &IPPClient{host, port, username, password, useTLS, &httpClient}
+	return &IPPClient{host, port, namespace, username, password, useTLS, &httpClient}
 }
 
 func (c *IPPClient) getHttpUri(namespace string, object interface{}) string {
@@ -64,8 +65,8 @@ func (c *IPPClient) getHttpUri(namespace string, object interface{}) string {
 	return uri
 }
 
-func (c *IPPClient) getPrinterUri(printer string) string {
-	return fmt.Sprintf("ipp://localhost/printers/%s", printer)
+func (c *IPPClient) getPrinterUri(namespace string, printer string) string {
+	return fmt.Sprintf("ipp://localhost/%s/%s", namespace, printer)
 }
 
 func (c *IPPClient) getJobUri(jobID int) string {
@@ -144,7 +145,7 @@ func (c *IPPClient) PrintDocuments(docs []Document, printer string, jobAttribute
 		req.JobAttributes[key] = value
 	}
 
-	resp, err := c.SendRequest(c.getHttpUri("printers", printer), req, nil)
+	resp, err := c.SendRequest(c.getHttpUri(c.namespace, printer), req, nil)
 	if err != nil {
 		return -1, err
 	}
@@ -168,7 +169,7 @@ func (c *IPPClient) PrintDocuments(docs []Document, printer string, jobAttribute
 		req.File = doc.Document
 		req.FileSize = doc.Size
 
-		_, err = c.SendRequest(c.getHttpUri("printers", printer), req, nil)
+		_, err = c.SendRequest(c.getHttpUri(c.namespace, printer), req, nil)
 		if err != nil {
 			return -1, err
 		}
@@ -198,7 +199,7 @@ func (c *IPPClient) PrintJob(doc Document, printer string, jobAttributes map[str
 	req.File = doc.Document
 	req.FileSize = doc.Size
 
-	resp, err := c.SendRequest(c.getHttpUri("printers", printer), req, nil)
+	resp, err := c.SendRequest(c.getHttpUri(c.namespace, printer), req, nil)
 	if err != nil {
 		return -1, err
 	}
@@ -251,7 +252,7 @@ func (c *IPPClient) GetPrinterAttributes(printer string, attributes []string) (A
 		req.OperationAttributes[AttributeRequestedAttributes] = attributes
 	}
 
-	resp, err := c.SendRequest(c.getHttpUri("printers", printer), req, nil)
+	resp, err := c.SendRequest(c.getHttpUri(c.namespace, printer), req, nil)
 	if err != nil {
 		return nil, err
 	}
