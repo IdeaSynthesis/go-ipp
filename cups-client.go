@@ -200,7 +200,7 @@ func (c *CUPSClient) SetPrinterDeviceURI(printer, deviceURI string) error {
 // SetPrinterIsShared shares or unshares a printer in the network
 func (c *CUPSClient) SetPrinterIsShared(printer string, shared bool) error {
 	req := NewRequest(OperationCupsAddModifyPrinter, 1)
-	req.OperationAttributes[AttributePrinterURI] = c.getPrinterUri(printer)
+	req.OperationAttributes[AttributePrinterURI] = c.getPrinterUri(c.namespace, printer)
 	req.OperationAttributes[AttributePrinterIsShared] = shared
 
 	_, err := c.SendRequest(c.getHttpUri("admin", ""), req, nil)
@@ -210,7 +210,7 @@ func (c *CUPSClient) SetPrinterIsShared(printer string, shared bool) error {
 // SetPrinterErrorPolicy sets the error policy for a printer
 func (c *CUPSClient) SetPrinterErrorPolicy(printer string, errorPolicy string) error {
 	req := NewRequest(OperationCupsAddModifyPrinter, 1)
-	req.OperationAttributes[AttributePrinterURI] = c.getPrinterUri(printer)
+	req.OperationAttributes[AttributePrinterURI] = c.getPrinterUri(c.namespace, printer)
 	req.PrinterAttributes[AttributePrinterErrorPolicy] = string(errorPolicy)
 
 	_, err := c.SendRequest(c.getHttpUri("admin", ""), req, nil)
@@ -220,7 +220,7 @@ func (c *CUPSClient) SetPrinterErrorPolicy(printer string, errorPolicy string) e
 // SetPrinterInformation sets general printer information
 func (c *CUPSClient) SetPrinterInformation(printer, information string) error {
 	req := NewRequest(OperationCupsAddModifyPrinter, 1)
-	req.OperationAttributes[AttributePrinterURI] = c.getPrinterUri(printer)
+	req.OperationAttributes[AttributePrinterURI] = c.getPrinterUri(c.namespace, printer)
 	req.PrinterAttributes[AttributePrinterInfo] = information
 
 	_, err := c.SendRequest(c.getHttpUri("admin", ""), req, nil)
@@ -230,7 +230,7 @@ func (c *CUPSClient) SetPrinterInformation(printer, information string) error {
 // SetPrinterLocation sets the printer location
 func (c *CUPSClient) SetPrinterLocation(printer, location string) error {
 	req := NewRequest(OperationCupsAddModifyPrinter, 1)
-	req.OperationAttributes[AttributePrinterURI] = c.getPrinterUri(printer)
+	req.OperationAttributes[AttributePrinterURI] = c.getPrinterUri(c.namespace, printer)
 	req.PrinterAttributes[AttributePrinterLocation] = location
 
 	_, err := c.SendRequest(c.getHttpUri("admin", ""), req, nil)
@@ -240,7 +240,7 @@ func (c *CUPSClient) SetPrinterLocation(printer, location string) error {
 // DeletePrinter deletes a printer
 func (c *CUPSClient) DeletePrinter(printer string) error {
 	req := NewRequest(OperationCupsDeletePrinter, 1)
-	req.OperationAttributes[AttributePrinterURI] = c.getPrinterUri(printer)
+	req.OperationAttributes[AttributePrinterURI] = c.getPrinterUri(c.namespace, printer)
 
 	_, err := c.SendRequest(c.getHttpUri("admin", ""), req, nil)
 	return err
