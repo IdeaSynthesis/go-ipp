@@ -1,3 +1,3 @@
-module github.com/IdeaSynthesis/go-ipp
+module github.com/ideasynthesis/go-ipp
 
 go 1.13
